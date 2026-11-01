@@ -1,0 +1,23 @@
+driver:
+  kind: modern_ebpf
+  modernEbpf:
+    leastPrivileged: true
+
+falco:
+  json_output: true
+  json_include_output_property: true
+  stdout_output:
+    enabled: true
+
+customRules:
+  lab404-runtime.yaml: |
+    - rule: Lab404 terminal shell
+      desc: Detect interactive shells in lab404 containers.
+      condition: >
+        spawned_process and container and
+        k8s.ns.name=lab404 and proc.name in (sh, bash, ash, zsh)
+      output: >
+        Lab404 terminal shell (user=%user.name user_loginuid=%user.loginuid
+        command=%proc.cmdline container=%container.name image=%container.image.repository:%container.image.tag
+        pod=%k8s.pod.name namespace=%k8s.ns.name node=%k8s.node.name)
+      priority: WARNING
