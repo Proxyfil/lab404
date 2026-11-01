@@ -5,8 +5,7 @@ resources:
 images:
   - name: ghcr.io/leofvo/lab404-web
     newName: ghcr.io/proxyfil/lab404-web
-    newTag: latest
+    digest: sha256:d9a10a8c6967afcf325b04bef29e82f3b8fc7cbb5413b4d16d616f94ffa31498
   - name: ghcr.io/leofvo/lab404-votes
     newName: ghcr.io/proxyfil/lab404-votes
-    newTag: latest
-
+    digest: sha256:9b4be8067945e24f78dbf9478137b84ccd70331370dc1eb98d32f4a9b8a70b7d
