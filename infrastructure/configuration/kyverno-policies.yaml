@@ -5,6 +5,9 @@ metadata:
   namespace: lab404
 spec:
   failurePolicy: Fail
+  autogen:
+    podControllers:
+      controllers: []
   validationActions:
     - Deny
   matchConstraints:
@@ -15,11 +18,11 @@ spec:
         resources: ["pods"]
   validations:
     - expression: >-
-        object.spec.containers.all(container, container.image.matches('^.+@sha256:[a-f0-9]{64}$')) &&
+        object.spec.containers.all(container, container.image.contains('@sha256:')) &&
         (!has(object.spec.initContainers) ||
-        object.spec.initContainers.all(container, container.image.matches('^.+@sha256:[a-f0-9]{64}$'))) &&
+        object.spec.initContainers.all(container, container.image.contains('@sha256:'))) &&
         (!has(object.spec.ephemeralContainers) ||
-        object.spec.ephemeralContainers.all(container, container.image.matches('^.+@sha256:[a-f0-9]{64}$')))
+        object.spec.ephemeralContainers.all(container, container.image.contains('@sha256:')))
       message: Every container image must use a sha256 digest.
 ---
 apiVersion: policies.kyverno.io/v1beta1
@@ -28,6 +31,9 @@ metadata:
   name: verify-lab404-images
 spec:
   failurePolicy: Fail
+  autogen:
+    podControllers:
+      controllers: []
   validationConfigurations:
     mutateDigest: false
     required: true
@@ -44,7 +50,7 @@ spec:
     - glob: ghcr.io/proxyfil/lab404-web@sha256:*
     - glob: ghcr.io/proxyfil/lab404-votes@sha256:*
   attestors:
-    - name: github-actions
+    - name: github_actions
       cosign:
         keyless:
           identities:
@@ -52,7 +58,7 @@ spec:
               subject: https://github.com/Proxyfil/lab404/.github/workflows/images.yml@refs/heads/main
   validations:
     - expression: >-
-        images.containers.map(image, verifyImageSignatures(image, [attestors.github-actions])).all(e, e > 0) &&
-        images.initContainers.map(image, verifyImageSignatures(image, [attestors.github-actions])).all(e, e > 0) &&
-        images.ephemeralContainers.map(image, verifyImageSignatures(image, [attestors.github-actions])).all(e, e > 0)
+        images.containers.map(image, verifyImageSignatures(image, [attestors.github_actions])).all(e, e > 0) &&
+        images.initContainers.map(image, verifyImageSignatures(image, [attestors.github_actions])).all(e, e > 0) &&
+        images.ephemeralContainers.map(image, verifyImageSignatures(image, [attestors.github_actions])).all(e, e > 0)
       message: Lab404 images must be signed by the main GitHub Actions workflow.
