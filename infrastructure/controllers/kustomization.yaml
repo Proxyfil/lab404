@@ -35,3 +35,8 @@ helmCharts:
     valuesInline:
       admissionController:
         replicas: 1
+  - name: sealed-secrets
+    repo: https://charts.bitnami.com/bitnami
+    version: 2.5.19
+    releaseName: sealed-secrets
+    namespace: sealed-secrets
